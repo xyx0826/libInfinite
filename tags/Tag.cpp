@@ -1,5 +1,6 @@
 #include "Tag.h"
 
+#include <cstdint>
 #include <cstring>
 void* Tag::getResource(uint32_t offset, uint32_t size){
 	// find which resource that area starts in
@@ -23,7 +24,8 @@ void* Tag::getResource(uint32_t offset, uint32_t size){
 				}
 			}
 			// all required resources should now be loaded
-			return resourcePointer + offset;
+			auto ptr = static_cast<char *>(resourcePointer);
+			return static_cast<void *>(ptr + offset);
 		}
 	}
 	return nullptr;
@@ -55,7 +57,8 @@ void Tag::loadResource(int index){
 	if(data == nullptr){
 		return;
 	}
-	memcpy(resourcePointer + resources[index].offset,data,resources[index].size);
+	auto ptr = static_cast<char *>(resourcePointer);
+	memcpy(ptr + resources[index].offset, data, resources[index].size);
 	resources[index].status = TagResource::RESOURCE_LOADED;
 	free(data);
 }

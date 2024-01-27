@@ -9,6 +9,7 @@
 
 #include "TagManager.h"
 
+#include <cstdint>
 #include <cstdio>
 
 #define CTE_TYPE_ROOT 0
@@ -144,7 +145,7 @@ int TagLoader::fixupStruct(void* structStart, bool skipOnly, ContentTableEntry* 
 			fieldIndex++;
 		}
 		if(desc[descOffset] == STRUCTDEFS_TYPE_TAGBLOCK){
-			tagBlock<void>* tblk = (tagBlock<void>*)(structStart + currentStructOffset);
+			tagBlock<void>* tblk = (tagBlock<void>*)(static_cast<uint8_t *>(structStart) + currentStructOffset);
 			// Potential bug: if tblk->count is 0 and there is no ref for the CTE, currentDataTableIndex could get messed up, which will cause problems later
 			if(tblk == nullptr && !skipOnly){
 				return -1;
@@ -178,7 +179,7 @@ int TagLoader::fixupStruct(void* structStart, bool skipOnly, ContentTableEntry* 
 					// each child in that block may need to be fixed up as well
 					// this function doesn't know the type of that child struct, so the tblk->block pointer cannot be accessed like an array
 					// however, fixupStruct returns the size of the struct, and the count is known, so the pointer can simply be advanced each time
-					void* childBlockPtr = tblk->block;
+					uint8_t* childBlockPtr = static_cast<uint8_t *>(tblk->block);
 					pushCTE();
 					for(int childBlock = 0; childBlock < tblk->count; childBlock++){
 						// since this struct will be read over and over again, the descriptor will have to be read from the same offset
@@ -209,7 +210,7 @@ int TagLoader::fixupStruct(void* structStart, bool skipOnly, ContentTableEntry* 
 			ContentTableEntry* cte = &item->contentTable.entries[currentContentTableIndex];
 			descOffset++;
 			if(!skipOnly){
-				externalResource<void>* res = (externalResource<void>*)(structStart + currentStructOffset);
+				externalResource<void>* res = (externalResource<void>*)(static_cast<uint8_t *>(structStart) + currentStructOffset);
 				//res->cte = cte;
 				void* resourceMetaData = item->getRefDataBlock(cte);
 				if(resourceMetaData != nullptr){
@@ -232,7 +233,7 @@ int TagLoader::fixupStruct(void* structStart, bool skipOnly, ContentTableEntry* 
 
 		if(desc[descOffset] == STRUCTDEFS_TYPE_TAG_REFERENCE){
 			if(!skipOnly && loadChildren){
-				tagReference* ref = (tagReference*)(structStart + currentStructOffset);
+				tagReference* ref = (tagReference*)(static_cast<uint8_t *>(structStart) + currentStructOffset);
 				if(ref->assetId != -1){
 					Tag* tag = manager->getTag(ref->globalId);
 					if(tag != nullptr){
@@ -258,7 +259,7 @@ int TagLoader::fixupStruct(void* structStart, bool skipOnly, ContentTableEntry* 
 				currentContentTableIndex++;
 				(*childIndex)++;
 			}
-			int inc = fixupStruct(structStart + currentStructOffset, skipOnly, parentCTE);
+			int inc = fixupStruct(static_cast<uint8_t *>(structStart) + currentStructOffset, skipOnly, parentCTE);
 			if(inc == -1){
 				return -1;
 			}

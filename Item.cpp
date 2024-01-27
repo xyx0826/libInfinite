@@ -1,5 +1,6 @@
 #include "Item.h"
 
+#include <cstdint>
 #include <cstdlib>
 #include <cstring>
 
@@ -89,7 +90,7 @@ Item::~Item(){
 	//printf("deleting Item\n");
 }
 
-void* Item::getDataBlock(DataTableEntry* entry){
+uint8_t* Item::getDataBlock(DataTableEntry* entry){
 	// get the full offset in the file. This depends on the region the data block is in
 	uint32_t offset = entry->offset;
 	if(entry->region == 1){
@@ -106,7 +107,7 @@ void* Item::getDataBlock(DataTableEntry* entry){
 	return data + offset;
 }
 
-void* Item::getRefDataBlock(ContentTableEntry* entry){
+uint8_t* Item::getRefDataBlock(ContentTableEntry* entry){
 	if(entry->ref == -1){
 		// no ref
 		return nullptr;

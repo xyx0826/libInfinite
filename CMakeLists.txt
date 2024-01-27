@@ -23,11 +23,6 @@ target_include_directories(Infinite PRIVATE ${CMAKE_CURRENT_LIST_DIR}/3rd_party/
 
 find_package(PNG REQUIRED)
 target_link_libraries(Infinite ${PNG_LIBRARIES})
-find_package(jsoncpp REQUIRED)
-target_link_libraries(Infinite jsoncpp)
-get_target_property(JSON_INC_PATH jsoncpp_lib INTERFACE_INCLUDE_DIRECTORIES)
-message(STATUS "JSON include path: ${JSON_INC_PATH}")
-target_include_directories(Infinite PRIVATE ${JSON_INC_PATH})
 
 # libpng++ is also needed, but not available in msys2
 if(DOWNLOAD_PNGPP)
@@ -57,10 +52,7 @@ target_sources(Infinite PRIVATE ${CMAKE_CURRENT_LIST_DIR}/DataTable.cpp ${CMAKE_
 target_sources(Infinite PRIVATE ${CMAKE_CURRENT_LIST_DIR}/TagRefFieldTable.cpp ${CMAKE_CURRENT_LIST_DIR}/Item.cpp)
 target_sources(Infinite PRIVATE ${CMAKE_CURRENT_LIST_DIR}/Header.cpp ${CMAKE_CURRENT_LIST_DIR}/TagRefTable.cpp)
 target_sources(Infinite PRIVATE ${CMAKE_CURRENT_LIST_DIR}/DataRefTable.cpp)
-target_sources(Infinite PRIVATE ${CMAKE_CURRENT_LIST_DIR}/BitmapHandle.cpp
-								${CMAKE_CURRENT_LIST_DIR}/contentUtils.cpp
-								${CMAKE_CURRENT_LIST_DIR}/BitmapBatchExtractor.cpp
-								${CMAKE_CURRENT_LIST_DIR}/MaterialJsonExporter.cpp								
+target_sources(Infinite PRIVATE ${CMAKE_CURRENT_LIST_DIR}/contentUtils.cpp
 								${CMAKE_CURRENT_LIST_DIR}/StringIDLUT.cpp)
 
 include(${CMAKE_CURRENT_LIST_DIR}/module/CMakeLists.txt)
@@ -73,7 +65,17 @@ include(${CMAKE_CURRENT_LIST_DIR}/models/CMakeLists.txt)
 
 #target_link_libraries(infiniteExplorer ${GTKMM_LIBRARIES})
 
+include(FetchContent)
 
+FetchContent_Declare(
+	glm
+	GIT_REPOSITORY	https://github.com/g-truc/glm.git
+	GIT_TAG 	bf71a834948186f4097caa076cd2663c69a10e1e #refs/tags/0.9.9.8
+)
+
+FetchContent_MakeAvailable(glm)
+
+target_link_libraries(Infinite glm::glm)
 
 #link against oodle (or linoodle)
 

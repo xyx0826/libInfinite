@@ -8,6 +8,7 @@
 #include "logger/logger.h"
 #include "module/ModuleItem.h"
 
+#include <cstdint>
 #include <string>
 #include "TagRefFieldTable.h"
 
@@ -35,9 +36,9 @@ public:
 	~Item();
 
 	// returns a pointer to the start of this blocks data. The data does not get copied again, so this pointer is only valid as long as this item exists
-	void* getDataBlock(DataTableEntry* entry);
+	uint8_t* getDataBlock(DataTableEntry* entry);
 	uint32_t getDataBlockOffset(DataTableEntry* entry);
-	void* getRefDataBlock(ContentTableEntry* entry);
+	uint8_t* getRefDataBlock(ContentTableEntry* entry);
 
 
 private:
